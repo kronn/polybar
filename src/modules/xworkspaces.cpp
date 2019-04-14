@@ -252,7 +252,7 @@ namespace modules {
       names.erase(names.begin()+desktops_number, names.end());
       return names;
     }
-    for (unsigned int i = names.size(); i < desktops_number + 1; i++) {
+    for (unsigned int i = names.size(); i < desktops_number; i++) {
       names.insert(names.end(), to_string(i));
     }
     return names;
