@@ -17,7 +17,7 @@ namespace {
   inline bool operator==(const position& a, const position& b) {
     return a.x + a.y == b.x + b.y;
   }
-}
+}  // namespace
 
 namespace modules {
   template class module<xworkspaces_module>;
@@ -144,7 +144,9 @@ namespace modules {
     while (it_old != clients.end() || it_new != m_clientlist.end()) {
       if (it_old != clients.end()) {
         auto desktop = ewmh_util::get_desktop_from_window(*it_old);
-        m_desktop_occupied[desktop] = true;
+        if (desktop != 0xffffffff) {
+          m_desktop_occupied[desktop] = true;
+        }
       }
       if (it_new == m_clientlist.end() || (it_old != clients.end() && *it_old < *it_new)) {
         // listen for wm_hint (urgency) changes
@@ -216,7 +218,7 @@ namespace modules {
       offset += step;
     }
     m_desktop_occupied.resize(m_desktop_names.size(), false);
- }
+  }
 
   /**
    * Update active state of current desktops
@@ -224,7 +226,6 @@ namespace modules {
   void xworkspaces_module::rebuild_desktop_states() {
     for (auto&& v : m_viewports) {
       for (auto&& d : v->desktops) {
-
         if (m_desktop_names[d->index] == m_current_desktop_name) {
           d->state = desktop_state::ACTIVE;
         } else if (m_desktop_occupied[d->index]) {
@@ -242,14 +243,13 @@ namespace modules {
     }
   }
 
-  vector<string> xworkspaces_module::get_desktop_names(){
+  vector<string> xworkspaces_module::get_desktop_names() {
     vector<string> names = ewmh_util::get_desktop_names();
     unsigned int desktops_number = ewmh_util::get_number_of_desktops();
-    if(desktops_number == names.size()) {
+    if (desktops_number == names.size()) {
       return names;
-    }
-    else if(desktops_number < names.size()) {
-      names.erase(names.begin()+desktops_number, names.end());
+    } else if (desktops_number < names.size()) {
+      names.erase(names.begin() + desktops_number, names.end());
       return names;
     }
     for (unsigned int i = names.size(); i < desktops_number; i++) {
@@ -263,7 +263,7 @@ namespace modules {
    */
   void xworkspaces_module::set_desktop_urgent(xcb_window_t window) {
     auto desk = ewmh_util::get_desktop_from_window(window);
-    if(desk == m_current_desktop)
+    if (desk == m_current_desktop)
       // ignore if current desktop is urgent
       return;
     for (auto&& v : m_viewports) {
@@ -389,6 +389,6 @@ namespace modules {
 
     return true;
   }
-}
+}  // namespace modules
 
 POLYBAR_NS_END
